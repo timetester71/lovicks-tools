@@ -11,7 +11,7 @@ mariabackup_path="/usr/bin/mariabackup";
 
 # Sanity Checks
 if [[ ! -d "${base_path}" ]]; then echo "Backup Folder '${1}' not found"; exit; fi
-if [[ ! -f "${base_path}/ibdata1" ]]; then echo "This does not seem to be a mariabackup folder"; exit; fi
+if [[ ! -f "${base_path}/FULL/ibdata1" ]]; then echo "This does not seem to be a mariabackup folder"; exit; fi
 
 # Stop MariaDB
 `service mariadb stop`;
@@ -20,7 +20,7 @@ if [[ ! -f "${base_path}/ibdata1" ]]; then echo "This does not seem to be a mari
 `mv /var/lib/mysql /var/lib/mysql_ORIG; mkdir /var/lib/mysql;`;
 
 # Copy Prepared Data
-`${mariabackup_path} --copy-back --target-dir=${base_path}`;
+`${mariabackup_path} --copy-back --target-dir=${base_path}/FULL`;
 
 # Change ownership of copied data
 `chown mysql:mysql -Rf /var/lib/mysql`;

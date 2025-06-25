@@ -20,7 +20,7 @@ if [[ ! -d "${base_path}" ]]; then exit; fi
 for i in {1..24}
 do
 	# Create Incrent Folder
-	increment_path="${base_path}/_INC-${i}";
+	increment_path="${base_path}/INC/_INC-${i}";
 
 	if [[ ! -d "${increment_path}" ]]; then
 		`mkdir -p "${increment_path}"`;
@@ -29,13 +29,13 @@ do
 		if [[ $i == 1 ]]; then
 
 			# Increment the first full backup
-			target="${base_path}";
+			target="${base_path}/FULL/";
 
 		elif [[ $i > 1 ]]; then
 
 			# Increment the previous incremental backup
 			previous_i=$((i - 1));
-			target="${base_path}/_INC-${previous_i}";
+			target="${base_path}/INC/_INC-${previous_i}";
 
 		fi
 

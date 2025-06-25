@@ -21,14 +21,18 @@ previous_backup_path="${base_path}/DAY-${previous_day_of_week}";
 archive_filename="${base_path}/mariadb_backup_${server}_${previous_day_of_week}.tgz";
 
 # Archive Previous Day Backup (7 Day Rotation)
-if [[ -d "${previous_backup_path}" ]]; then `rm -f ${archive_filename} 2> /dev/null; ${nice_path} -n 10 ${tar_path} -zcf ${archive_filename} ${previous_backup_path} 2> /dev/null && rm -Rf ${previous_backup_path}`; fi
+if [[ -d "${previous_backup_path}" ]]; then
+    `rm -f ${archive_filename} 2> /dev/null; \
+    ${nice_path} -n 10 ${tar_path} -zcf ${archive_filename} ${previous_backup_path} 2> /dev/null \
+    && rm -Rf ${previous_backup_path}`;
+fi
 
 # Create Todays Backup Environment
 if [[ -d "${backup_path}" ]]; then `/usr/bin/rm -Rf ${backup_path}`; fi
-if [[ ! -d "${backup_path}" ]]; then `/usr/bin/mkdir -p ${backup_path}`; fi
+if [[ ! -d "${backup_path}" ]]; then `/usr/bin/mkdir -p ${backup_path}/FULL`; fi
 
 # Run Backup
-`${nice_path} -n 10 ${mariabackup_path} --backup --target-dir=${backup_path} 2> /dev/null;`;
+`${nice_path} -n 10 ${mariabackup_path} --backup --target-dir=${backup_path}/FULL 2> /dev/null;`;
 
 
 exit;

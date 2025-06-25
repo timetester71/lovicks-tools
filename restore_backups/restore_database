@@ -11,19 +11,19 @@ mariabackup_path="/usr/bin/mariabackup";
 
 # Sanity Checks
 if [[ ! -d "${base_path}" ]]; then echo "Backup Folder '${1}' not found"; exit; fi
-if [[ ! -f "${base_path}/ibdata1" ]]; then echo "This does not seem to be a mariabackup folder"; exit; fi
+if [[ ! -f "${base_path}/FULL/ibdata1" ]]; then echo "This does not seem to be a mariabackup folder"; exit; fi
 
 # Run PREPARE on FULL backup
-`${mariabackup_path} --prepare --target-dir=${base_path}`;
+`${mariabackup_path} --prepare --target-dir=${base_path}/FULL`;
 
 # Run PREPARE on INCREMENTAL backups one by one
 for i in {1..24}
 do
 
-	increment_path="${base_path}/_INC-${i}";
+	increment_path="${base_path}/INC/_INC-${i}";
 
 	if [[ -d "${increment_path}" ]]; then
-		`${mariabackup_path} --prepare --target-dir=${base_path} --incremental-basedir=${increment_path}`;
+		`${mariabackup_path} --prepare --target-dir=${base_path}/FULL --incremental-basedir=${increment_path}`;
 	fi
 
 done
