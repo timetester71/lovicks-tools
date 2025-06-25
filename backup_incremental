@@ -6,8 +6,10 @@
 #########################################################################
 
 # Setup
+db_dumps=("watchfix" "ipboard" "ipboard_archive" "mailer" "wrt-resources");
 base_path='/var/www/backup/mariadb';
 mariabackup_path="/usr/bin/mariabackup";
+mysql_dump_path="/usr/bin/mysqldump";
 nice_path="/usr/bin/nice";
 # Constants
 day_of_week=`date +%u`;
@@ -19,11 +21,20 @@ if [[ ! -d "${base_path}" ]]; then exit; fi
 # Decide which increment number we are
 for i in {1..24}
 do
-	# Create Incrent Folder
+	# Create Incrent & Dumps Folder
 	increment_path="${base_path}/INC/_INC-${i}";
+	dump_path="${base_path}/DUMP/_DUMP-${i}";
 
 	if [[ ! -d "${increment_path}" ]]; then
 		`mkdir -p "${increment_path}"`;
+
+		if [[ ! -d "${dump_path}" ]]; then
+			`mkdir -p "${dump_path}"`;
+
+			for dbname in "${db_dumps[@]}"; do
+				`${nice_path} -n 10 ${mysql_dump_path}  --single-transaction --quick ${dbname} > ${dump_path}/${dbname}.sql`;
+			done; 
+		fi
 
 		# Determine Previous Backup Location (Full or Increment)
 		if [[ $i == 1 ]]; then
