@@ -48,6 +48,9 @@ do
 			previous_i=$((i - 1));
 			target="${base_path}/INC/_INC-${previous_i}";
 
+			# Remove previous dumps (They get too big)
+			`rm -Rf ${base_path}/DUMP/_DUMP-${previous_i}`
+
 		fi
 
 		# Create the incremental backup
