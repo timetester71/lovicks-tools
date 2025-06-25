@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# Script for backing up the MariaDB database
+# INCREMENTAL - FOR A 60 MINUTE CRON JOB (24 per day)
+#
+#########################################################################
+
+# Setup
+base_path='/var/www/backup/mariadb';
+mariabackup_path="/usr/bin/mariabackup";
+nice_path="/usr/bin/nice";
+# Constants
+day_of_week=`date +%u`;
+base_path="${base_path}/DAY-${day_of_week}";
+
+# Quit if no full backup found for today.
+if [[ ! -d "${base_path}" ]]; then exit; fi
+
+# Decide which increment number we are
+for i in {1..24}
+do
+	# Create Incrent Folder
+	increment_path="${base_path}/_INC-${i}";
+
+	if [[ ! -d "${increment_path}" ]]; then
+		`mkdir -p "${increment_path}"`;
+
+		# Determine Previous Backup Location (Full or Increment)
+		if [[ $i == 1 ]]; then
+
+			# Increment the first full backup
+			target="${base_path}";
+
+		elif [[ $i > 1 ]]; then
+
+			# Increment the previous incremental backup
+			previous_i=$((i - 1));
+			target="${base_path}/_INC-${previous_i}";
+
+		fi
+
+		# Create the incremental backup
+		if [[ -d "${increment_path}" ]]; then
+			`${nice_path} -n 10 ${mariabackup_path} --backup --target-dir=${increment_path} --incremental-basedir=${target} 2> /dev/null`;
+		fi
+
+		break;
+	fi
+
+done
+
+exit;

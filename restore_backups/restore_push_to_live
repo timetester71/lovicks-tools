@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# Script for RESTORING the MariaDB database
+# INCREMENTAL - FOR A 60 MINUTE CRON JOB (24 per day)
+#
+#########################################################################
+
+# Setup
+base_path=$1;
+mariabackup_path="/usr/bin/mariabackup";
+
+# Sanity Checks
+if [[ ! -d "${base_path}" ]]; then echo "Backup Folder '${1}' not found"; exit; fi
+if [[ ! -f "${base_path}/ibdata1" ]]; then echo "This does not seem to be a mariabackup folder"; exit; fi
+
+# Stop MariaDB
+`service mariadb stop`;
+
+# Move Original DB
+`mv /var/lib/mysql /var/lib/mysql_ORIG; mkdir /var/lib/mysql;`;
+
+# Copy Prepared Data
+`${mariabackup_path} --copy-back --target-dir=${base_path}`;
+
+# Change ownership of copied data
+`chown mysql:mysql -Rf /var/lib/mysql`;
+
+# Restart MariaDB
+`service mariadb start`;
+
+
+echo "---------------------------------------------------------------------------------------------------";
+echo "Done!";
+
+echo "Test with...";
+
+echo "select * from ipb_core_members ORDER BY member_id DESC LIMIT 1;";
+echo "---------------------------------------------------------------------------------------------------";

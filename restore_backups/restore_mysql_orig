@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# Command for RESTORING a mysql_ORIG folder
+#
+#########################################################################
+
+`service mariadb stop; rm -Rf /var/lib/mysql; mv /var/lib/mysql_ORIG /var/lib/mysql; service mariadb start`;

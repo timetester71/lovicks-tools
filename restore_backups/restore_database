@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Script for RESTORING the MariaDB database
+# INCREMENTAL - FOR A 60 MINUTE CRON JOB (24 per day)
+#
+#########################################################################
+
+# Setup
+base_path=$1;
+mariabackup_path="/usr/bin/mariabackup";
+
+# Sanity Checks
+if [[ ! -d "${base_path}" ]]; then echo "Backup Folder '${1}' not found"; exit; fi
+if [[ ! -f "${base_path}/ibdata1" ]]; then echo "This does not seem to be a mariabackup folder"; exit; fi
+
+# Run PREPARE on FULL backup
+`${mariabackup_path} --prepare --target-dir=${base_path}`;
+
+# Run PREPARE on INCREMENTAL backups one by one
+for i in {1..24}
+do
+
+	increment_path="${base_path}/_INC-${i}";
+
+	if [[ -d "${increment_path}" ]]; then
+		`${mariabackup_path} --prepare --target-dir=${base_path} --incremental-basedir=${increment_path}`;
+	fi
+
+done
